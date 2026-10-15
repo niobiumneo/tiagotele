@@ -7,10 +7,7 @@ This repository builds **only the teleop parts** of
 [AdamSanderson93/ARC_ROS2_TIAGO](https://github.com/AdamSanderson93/ARC_ROS2_TIAGO) for use with
 the Quest app [AdamSanderson93/Unity_Bridge_VR](https://github.com/AdamSanderson93/Unity_Bridge_VR).
 It fixes the bugs that stop that stack from building and running, and adds tests that need no
-headset. It also documents how this stack differs from **PAL's own VR teleoperation**.
-
-> ARC_ROS2_TIAGO has no license file, so its source is **not copied into this repository**.
-> `build_teleop_ws.sh` fetches it at a pinned commit and applies the patches in `patches/`.
+headset. 
 
 ## How it works
 
@@ -137,24 +134,4 @@ written, so check every command against
 
 Never run both at the same time: they command the same joints.
 
-## Verification status
 
-Verified in a ROS 2 Humble container (`moveit/moveit2:humble-release`, Ubuntu 22.04):
-* A from-scratch build as a non-root user built 17 packages with no manual steps, and re-running
-  the script is idempotent. An emulated PAL docker (`/opt/pal` underlay) builds too.
-* The headless pipeline test (real TIAGo Pro URDF, fake joint states) produces trajectories on all
-  six controllers, with `time_from_start` 0.05 s and gripper targets within 0..0.07 m.
-* The fake-Unity TCP test passes.
-* `--transport both` builds, but was never run.
-
-**Not** verified: Gazebo, a real TIAGo Pro, a real Quest/Unity build, or DDS over a real network.
-
-## Credits and licenses
-
-* This repository's own files are under the BSD 3-Clause license (`LICENSE`).
-* Code fetched at build time keeps its own license:
-  * ARC_ROS2_TIAGO (AdamSanderson93; no license file; not redistributed here, only patched locally);
-  * bio_ik and fp (BSD);
-  * ROS-TCP-Endpoint (Apache-2.0);
-  * PAL Robotics packages (Apache-2.0).
-* Unity_Bridge_VR is a separate project by AdamSanderson93.
