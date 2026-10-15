@@ -1,0 +1,16 @@
+diff --git a/webrtc_launch/package.xml b/webrtc_launch/package.xml
+index ccf9778..709b797 100755
+--- a/webrtc_launch/package.xml
++++ b/webrtc_launch/package.xml
+@@ -14,6 +14,11 @@
+   <depend>opentera_webrtc_ros</depend>
+   <depend>opentera_webrtc_ros_msgs</depend>
+   <depend>rclcpp</depend>
++
++  <!-- Runtime deps of launch/tiago_pro.launch.xml (added by tiagotele patches) -->
++  <exec_depend>ik_teleop</exec_depend>               <!-- msg_string_bridge.py / string_msg_bridge.py -->
++  <exec_depend>rclpy_message_converter</exec_depend> <!-- imported by those two bridges -->
++  <exec_depend>topic_tools</exec_depend>             <!-- cmd_vel_relay -->
+   <!-- <depend>backward_ros</depend> -->
+   
+   <test_depend>ament_lint_auto</test_depend>

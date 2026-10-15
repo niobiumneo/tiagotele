@@ -1,0 +1,15 @@
+# Optional TRANSPORT=webrtc profile (old opentera WebRTC data-channel path, ARC submodule pins).
+# These repos have their own git submodules: clone with --recurse-submodules (vcs: --recursive).
+repositories:
+  webrtc/opentera-webrtc-ros:
+    type: git
+    url: https://github.com/introlab/opentera-webrtc-ros.git
+    version: cd3705b1c23a08d357617605e9162920453d2882
+  webrtc/audio_utils:
+    type: git
+    url: https://github.com/introlab/audio_utils.git
+    version: cfa851d947aee69a5dc590a35ec6b6ab25398a64
+  webrtc/odas_ros:          # odas_ros_msgs is needed by opentera's map_image_generator
+    type: git
+    url: https://github.com/introlab/odas_ros.git
+    version: 0d26e657fd129a5398469ed3d320d07a04462a4e

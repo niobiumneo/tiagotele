@@ -1,0 +1,19 @@
+diff --git a/3rdParty/make_openblas_unix.bash b/3rdParty/make_openblas_unix.bash
+index f077edb..ac55544 100644
+--- a/3rdParty/make_openblas_unix.bash
++++ b/3rdParty/make_openblas_unix.bash
+@@ -1,5 +1,13 @@
+ #!/bin/bash
+ 
+ if [ ! -f ./libopenblas.a ]; then
+-    make USE_THREAD=0
++    # OpenBLAS 0.3.20's CPU auto-detection fails on newer / virtualised CPUs
++    # ("SGEMM_DEFAULT_UNROLL_M undeclared"). Allow forcing a target, e.g.
++    # OPENBLAS_TARGET=HASWELL (any AVX2 x86_64) or SAPPHIRERAPIDS (see ARC_ROS2_TIAGO README).
++    if [ -n "${OPENBLAS_TARGET}" ]; then
++        make clean > /dev/null 2>&1 || true
++        make USE_THREAD=0 TARGET="${OPENBLAS_TARGET}"
++    else
++        make USE_THREAD=0
++    fi
+ fi

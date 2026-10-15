@@ -1,0 +1,33 @@
+diff --git a/gripper_traj_passthrough/config/pal_gripper_left.yaml b/gripper_traj_passthrough/config/pal_gripper_left.yaml
+index a997ab4..e38bb71 100755
+--- a/gripper_traj_passthrough/config/pal_gripper_left.yaml
++++ b/gripper_traj_passthrough/config/pal_gripper_left.yaml
+@@ -9,6 +9,9 @@ gripper_traj_node_left:
+ 
+     gripper_left_finger_joint:
+       joint_name: "gripper_left_finger_joint"
+-      open_angle: 0.0
+-      closed_angle: 0.95
++      # PAL Pro gripper (pal_pro_gripper >= 1.11): prismatic finger joint, 0.0 m = closed, 0.07 m = open.
++      # Check yours: ros2 param get /robot_state_publisher robot_description | grep -A4 'finger_joint" type'
++      # (older revolute grippers: open_angle 0.0, closed_angle 0.802850778)
++      open_angle: 0.07
++      closed_angle: 0.0
+       max_speed: 2.0
+\ No newline at end of file
+diff --git a/gripper_traj_passthrough/config/pal_gripper_right.yaml b/gripper_traj_passthrough/config/pal_gripper_right.yaml
+index 18d2ccc..76da5eb 100755
+--- a/gripper_traj_passthrough/config/pal_gripper_right.yaml
++++ b/gripper_traj_passthrough/config/pal_gripper_right.yaml
+@@ -9,6 +9,9 @@ gripper_traj_node_right:
+ 
+     gripper_right_finger_joint:
+       joint_name: "gripper_right_finger_joint"
+-      open_angle: 0.0
+-      closed_angle: 0.95
++      # PAL Pro gripper (pal_pro_gripper >= 1.11): prismatic finger joint, 0.0 m = closed, 0.07 m = open.
++      # Check yours: ros2 param get /robot_state_publisher robot_description | grep -A4 'finger_joint" type'
++      # (older revolute grippers: open_angle 0.0, closed_angle 0.802850778)
++      open_angle: 0.07
++      closed_angle: 0.0
+       max_speed: 2.0

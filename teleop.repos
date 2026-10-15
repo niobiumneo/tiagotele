@@ -1,0 +1,22 @@
+# vcstool file equivalent to what build_teleop_ws.sh fetches (versions pinned to what
+# ARC_ROS2_TIAGO references). build_teleop_ws.sh does NOT need vcstool; this is for people
+# who prefer `vcs import src < teleop.repos`.
+# NOTE: ARC_ROS2_TIAGO must then be reduced to the teleop packages yourself (the script uses a
+# sparse checkout: custom_teleop_messages bio_ik ik_teleop gripper_traj_passthrough [webrtc_launch])
+# and the ARC patches applied in order, e.g. from the workspace root:
+#   for p in /path/to/tiagotele/patches/0*.patch; do git -C src/ARC_ROS2_TIAGO apply "$p"; done
+# (w001 only for TRANSPORT=webrtc; w002 belongs to audio_utils' MusicBeatDetector, not to ARC).
+# Easier: just run build_teleop_ws.sh, which does all of this.
+repositories:
+  ARC_ROS2_TIAGO:
+    type: git
+    url: https://github.com/AdamSanderson93/ARC_ROS2_TIAGO.git
+    version: 32e37a484324bd0be29bf43ad7aed1e344594680
+  fp:                       # header-only FP lib required by bio_ik (ARC submodule 'fp')
+    type: git
+    url: https://github.com/tylerjw/fp.git
+    version: 32301582d41c5741ff6453db9791d7d594afd75f
+  ROS-TCP-Endpoint:         # TRANSPORT=tcp (Unity_Bridge_VR main uses ROS-TCP-Connector). main-ros2 = tag ROS2v0.7.0 (NOT v0.7.0 = ROS 1)
+    type: git
+    url: https://github.com/Unity-Technologies/ROS-TCP-Endpoint.git
+    version: 54c1a64b6d5ef6ffa0a0431570bb74329b79b15b

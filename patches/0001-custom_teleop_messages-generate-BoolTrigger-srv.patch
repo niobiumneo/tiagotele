@@ -1,0 +1,27 @@
+diff --git a/custom_teleop_messages/CMakeLists.txt b/custom_teleop_messages/CMakeLists.txt
+index 2fa5ae8..ed431c7 100755
+--- a/custom_teleop_messages/CMakeLists.txt
++++ b/custom_teleop_messages/CMakeLists.txt
+@@ -19,6 +19,7 @@ find_package(rosidl_default_generators REQUIRED)
+ rosidl_generate_interfaces(${PROJECT_NAME}
+   "msg/XRMod.msg"
+   "msg/XRPose.msg"
++  "srv/BoolTrigger.srv"
+   DEPENDENCIES builtin_interfaces std_msgs geometry_msgs
+  )
+ 
+diff --git a/custom_teleop_messages/package.xml b/custom_teleop_messages/package.xml
+index 8cdb59c..f8e9481 100755
+--- a/custom_teleop_messages/package.xml
++++ b/custom_teleop_messages/package.xml
+@@ -11,6 +11,10 @@
+   <build_depend>rosidl_default_generators</build_depend>
+   <build_depend>geometry_msgs</build_depend>
+   <build_depend>std_msgs</build_depend>
++  <build_depend>builtin_interfaces</build_depend>
++  <exec_depend>geometry_msgs</exec_depend>
++  <exec_depend>std_msgs</exec_depend>
++  <exec_depend>builtin_interfaces</exec_depend>
+ 
+   <test_depend>ament_lint_auto</test_depend>
+   <test_depend>ament_lint_common</test_depend>

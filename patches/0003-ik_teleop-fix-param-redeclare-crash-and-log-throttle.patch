@@ -1,0 +1,201 @@
+diff --git a/ik_teleop/include/ik_teleop/BIO_IK_Planner.h b/ik_teleop/include/ik_teleop/BIO_IK_Planner.h
+index b008726..581f746 100755
+--- a/ik_teleop/include/ik_teleop/BIO_IK_Planner.h
++++ b/ik_teleop/include/ik_teleop/BIO_IK_Planner.h
+@@ -20,6 +20,20 @@
+ 
+ #include <bio_ik/bio_ik.hpp>
+ 
++// control_node creates its node with automatically_declare_parameters_from_overrides(true),
++// so every parameter coming from the launch file / YAML is already declared. Calling
++// declare_parameter() again on such a name throws rclcpp::exceptions::ParameterAlreadyDeclaredException
++// (Humble behaviour) and kills the node at "Load Frequency". Only declare when still missing.
++template <typename T>
++inline void declare_parameter_if_not_declared(const rclcpp::Node::SharedPtr& node, const std::string& name,
++                                              const T& default_value)
++{
++    if (!node->has_parameter(name))
++    {
++        node->declare_parameter(name, default_value);
++    }
++}
++
+ 
+ class BIO_IK_Planner
+ {
+diff --git a/ik_teleop/src/BIO_IK_Planner.cpp b/ik_teleop/src/BIO_IK_Planner.cpp
+index 2f76a14..c573a01 100755
+--- a/ik_teleop/src/BIO_IK_Planner.cpp
++++ b/ik_teleop/src/BIO_IK_Planner.cpp
+@@ -16,53 +16,53 @@ BIO_IK_Planner::BIO_IK_Planner(rclcpp::Node::SharedPtr Node):
+ 
+     // Load parameters
+     RCLCPP_WARN_STREAM(Node_->get_logger(), "Load Frequency");
+-    Node_->declare_parameter("frequency", 0.0d);
++    declare_parameter_if_not_declared(Node_, "frequency", 0.0d);
+     hz = Node_->get_parameter("frequency").as_double();
+ 
+     RCLCPP_WARN_STREAM(Node_->get_logger(), "Load main group");
+-    Node_->declare_parameter("main_group", "group");
++    declare_parameter_if_not_declared(Node_, "main_group", "group");
+     main_group_ = Node_->get_parameter("main_group").as_string();
+ 
+     RCLCPP_WARN_STREAM(Node_->get_logger(), "Load root link");
+-    Node_->declare_parameter("root_link", "base_link");
++    declare_parameter_if_not_declared(Node_, "root_link", "base_link");
+     root_link_ = Node_->get_parameter("root_link").as_string();
+ 
+     RCLCPP_WARN_STREAM(Node_->get_logger(), "Load groups");
+-    Node_->declare_parameter("groups", std::vector<std::string>());
++    declare_parameter_if_not_declared(Node_, "groups", std::vector<std::string>());
+     groups_ = Node_->get_parameter("groups").as_string_array();
+ 
+     RCLCPP_WARN_STREAM(Node_->get_logger(), "Load center joint weights");
+-    Node_->declare_parameter("center_joints_weight", 0.0d);
++    declare_parameter_if_not_declared(Node_, "center_joints_weight", 0.0d);
+     center_weight_ = Node_->get_parameter("center_joints_weight").as_double();
+ 
+     RCLCPP_WARN_STREAM(Node_->get_logger(), "Load min disp weight");
+-    Node_->declare_parameter("min_displacement_weight", 0.0d);
++    declare_parameter_if_not_declared(Node_, "min_displacement_weight", 0.0d);
+     min_disp_weight_ = Node_->get_parameter("min_displacement_weight").as_double();
+     
+     RCLCPP_WARN_STREAM(Node_->get_logger(), "Load min disp joints");
+-    Node_->declare_parameter("min_displacement_joints", std::vector<std::string>());
++    declare_parameter_if_not_declared(Node_, "min_displacement_joints", std::vector<std::string>());
+     min_displacement_joints_ = Node_->get_parameter("min_displacement_joints").as_string_array();
+     
+     RCLCPP_WARN_STREAM(Node_->get_logger(), "Load min disp joints weights");
+-    Node_->declare_parameter("min_displacement_joints_weights", std::vector<double>());
++    declare_parameter_if_not_declared(Node_, "min_displacement_joints_weights", std::vector<double>());
+     min_displacement_joints_weights_= Node_->get_parameter("min_displacement_joints_weights").as_double_array();
+ 
+     RCLCPP_WARN_STREAM(Node_->get_logger(), "Load ik timeout");
+-    Node_->declare_parameter("ik_timeout", 0.0001d);
++    declare_parameter_if_not_declared(Node_, "ik_timeout", 0.0001d);
+     ik_timeout_ = Node_->get_parameter("ik_timeout").as_double();
+ 
+     RCLCPP_WARN_STREAM(Node_->get_logger(), "Load max speed");
+-    Node_->declare_parameter("default_max_speed", 0.1d);
++    declare_parameter_if_not_declared(Node_, "default_max_speed", 0.1d);
+     default_max_speed = Node_->get_parameter("default_max_speed").as_double();
+     
+     RCLCPP_WARN_STREAM(Node_->get_logger(), "Load Pose Goals");
+     std::vector<std::string> pose_goals;
+-    Node_->declare_parameter("pose_goals", pose_goals);
++    declare_parameter_if_not_declared(Node_, "pose_goals", pose_goals);
+     pose_goals = Node_->get_parameter("pose_goals").as_string_array();
+ 
+     RCLCPP_WARN_STREAM(Node_->get_logger(), "Load Joint Goals");
+     std::vector<std::string> joint_goals;
+-    Node_->declare_parameter("joint_goals", joint_goals);
++    declare_parameter_if_not_declared(Node_, "joint_goals", joint_goals);
+     joint_goals = Node_->get_parameter("joint_goals").as_string_array();
+ 
+     RCLCPP_WARN_STREAM(Node_->get_logger(), "Get Robot State");
+@@ -123,7 +123,7 @@ BIO_IK_Planner::BIO_IK_Planner(rclcpp::Node::SharedPtr Node):
+     for (const std::string& group_name : groups_)
+     {
+         RCLCPP_WARN_STREAM(Node_->get_logger(), std::string("Creating Motion Group: ") + group_name);
+-        Node_->declare_parameter(group_name+".speed_mult", 1.0d);
++        declare_parameter_if_not_declared(Node_, group_name+".speed_mult", 1.0d);
+         double speed_mult = Node_->get_parameter(group_name+".speed_mult").as_double();
+ 
+         RCLCPP_WARN_STREAM(Node_->get_logger(), "Making group: " << group_name);
+@@ -161,7 +161,7 @@ BIO_IK_Planner::BIO_IK_Planner(rclcpp::Node::SharedPtr Node):
+ 
+         current_state_->copyJointGroupPositions(group_name, current_position);
+         
+-        Node_->declare_parameter(group_name+".passive_group", false);
++        declare_parameter_if_not_declared(Node_, group_name+".passive_group", false);
+         bool passive_group = Node_->get_parameter(group_name+".passive_group").as_bool();
+ 
+         bio_groups_.push_back(new BIO_IK_Group(*this, group_name, joint_names, current_position, root_link_, hz, max_speeds, passive_group));
+@@ -268,7 +268,7 @@ bool BIO_IK_Planner::plan()
+ 
+         if (!found_ik)
+         {
+-            RCLCPP_WARN_STREAM_THROTTLE(Node_->get_logger(), *(Node_->get_clock()), 0.5, "No IK Found");
++            RCLCPP_WARN_STREAM_THROTTLE(Node_->get_logger(), *(Node_->get_clock()), 500 /* ms in ROS 2; was 0.5 */, "No IK Found");
+         }
+         else
+         {
+@@ -288,7 +288,7 @@ bool BIO_IK_Planner::plan()
+             if (scene_ro->isStateColliding(solution_state, main_group_, true))
+             {
+                 found_ik = false;
+-                RCLCPP_WARN_STREAM_THROTTLE(Node_->get_logger(), *(Node_->get_clock()), 0.5, "Planned End State Colliding");
++                RCLCPP_WARN_STREAM_THROTTLE(Node_->get_logger(), *(Node_->get_clock()), 500 /* ms in ROS 2; was 0.5 */, "Planned End State Colliding");
+             }
+         }
+ 
+@@ -361,7 +361,7 @@ bool BIO_IK_Planner::plan()
+ 
+         if (angular_motion < 0.001)
+         {
+-            RCLCPP_WARN_STREAM_THROTTLE(Node_->get_logger(), *(Node_->get_clock()), 0.5, "Commanded position is the same as current position");
++            RCLCPP_WARN_STREAM_THROTTLE(Node_->get_logger(), *(Node_->get_clock()), 500 /* ms in ROS 2; was 0.5 */, "Commanded position is the same as current position");
+             return false;
+         }
+         
+@@ -414,19 +414,19 @@ passive_(passive)
+     {
+         std::string sub_topic;
+ 
+-        parent.Node_->declare_parameter(name+".position_weight", 0.0d);
++        declare_parameter_if_not_declared(parent.Node_, name+".position_weight", 0.0d);
+         position_weight_ = parent.Node_->get_parameter(name+".position_weight").as_double();
+         
+-        parent.Node_->declare_parameter(name+".orient_weight", 0.0d);
++        declare_parameter_if_not_declared(parent.Node_, name+".orient_weight", 0.0d);
+         orientation_weight_ = parent.Node_->get_parameter(name+".orient_weight").as_double();
+         
+-        parent.Node_->declare_parameter(name+".pose_weight", 0.0d);
++        declare_parameter_if_not_declared(parent.Node_, name+".pose_weight", 0.0d);
+         pose_weight_ = parent.Node_->get_parameter(name+".pose_weight").as_double();
+         
+-        parent.Node_->declare_parameter(name+".z_weight", 0.0d);
++        declare_parameter_if_not_declared(parent.Node_, name+".z_weight", 0.0d);
+         z_weight_ = parent.Node_->get_parameter(name+".z_weight").as_double();
+ 
+-        parent.Node_->declare_parameter(name+".goal_link", 0.0d);
++        declare_parameter_if_not_declared(parent.Node_, name+".goal_link", 0.0d);
+         goal_link_ = parent.Node_->get_parameter(name+".goal_link").as_string();
+         
+         goal_pose_ = eigenIsometry3dToTf2Transform(parent.current_state_->getFrameTransform(goal_link_));
+@@ -438,7 +438,7 @@ passive_(passive)
+             exit(-1);
+         }
+ 
+-        parent.Node_->declare_parameter(name+".sub_topic", std::string("/")+name+std::string("/sub"));
++        declare_parameter_if_not_declared(parent.Node_, name+".sub_topic", std::string("/")+name+std::string("/sub"));
+         sub_topic = parent.Node_->get_parameter(name+".sub_topic").as_string();
+ 
+         sub_ = parent.Node_->create_subscription<geometry_msgs::msg::PoseStamped>(sub_topic, 1,
+@@ -523,10 +523,10 @@ joint_names_(joint_names)
+ {
+     std::string sub_topic, pub_topic;
+     
+-    parent.Node_->declare_parameter(group_name_+".pub_topic",std::string("/")+group_name_+std::string("/pub"));
++    declare_parameter_if_not_declared(parent.Node_, group_name_+".pub_topic",std::string("/")+group_name_+std::string("/pub"));
+     pub_topic = parent.Node_->get_parameter(group_name_+".pub_topic").as_string();
+ 
+-    parent.Node_->declare_parameter(group_name_+".allowable_lag", -1.0d);
++    declare_parameter_if_not_declared(parent.Node_, group_name_+".allowable_lag", -1.0d);
+     allowable_lag_ = parent.Node_->get_parameter(group_name_+".allowable_lag").as_double();
+ 
+     pub_ = parent.Node_->create_publisher<trajectory_msgs::msg::JointTrajectory>(pub_topic, 1);
+@@ -656,11 +656,11 @@ parent_(parent)
+ {
+     std::string sub_topic;
+ 
+-    parent.Node_->declare_parameter(name+".sub_topic",std::string("/")+name+std::string("/sub"));
++    declare_parameter_if_not_declared(parent.Node_, name+".sub_topic",std::string("/")+name+std::string("/sub"));
+     sub_topic = parent.Node_->get_parameter(name+".sub_topic").as_string();
+     
+     
+-    parent.Node_->declare_parameter(name+".default_weight",0.0d);
++    declare_parameter_if_not_declared(parent.Node_, name+".default_weight",0.0d);
+     default_weight_ = parent.Node_->get_parameter(name+".default_weight").as_double();
+ 
+     goal_ = sensor_msgs::msg::JointState();

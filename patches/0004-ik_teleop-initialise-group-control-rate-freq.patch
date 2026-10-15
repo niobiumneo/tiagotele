@@ -1,0 +1,16 @@
+diff --git a/ik_teleop/src/BIO_IK_Planner.cpp b/ik_teleop/src/BIO_IK_Planner.cpp
+index c573a01..43bdaab 100755
+--- a/ik_teleop/src/BIO_IK_Planner.cpp
++++ b/ik_teleop/src/BIO_IK_Planner.cpp
+@@ -531,6 +531,11 @@ joint_names_(joint_names)
+ 
+     pub_ = parent.Node_->create_publisher<trajectory_msgs::msg::JointTrajectory>(pub_topic, 1);
+     
++    // freq_ was never initialised (the hz argument was unused): time_from_start = 1/freq_ came out
++    // as a negative overflowed duration (sec -2147483648), velocities as denormals, and
++    // interpolate_motion() never limited joint speeds. Use the control rate, as intended.
++    freq_ = hz;
++
+     traj_.joint_names = joint_names_;
+     trajectory_msgs::msg::JointTrajectoryPoint temp_point;
+     temp_point.positions = current_position;

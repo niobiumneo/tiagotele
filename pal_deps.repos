@@ -1,0 +1,18 @@
+# Source fallback for the robot-model packages ik_teleop's launch file needs.
+# Only used by build_teleop_ws.sh when they are neither installed (PAL docker / robot:
+# /opt/pal/<distro>, or apt ros-humble-*) nor installable via rosdep. Tags = current
+# ros-humble binary releases. The script COLCON_IGNOREs everything except:
+#   launch_pal tiago_pro_description tiago_pro_moveit_config pal_sea_arm_moveit_config
+#   pal_sea_arm_description pal_pro_gripper_description tiago_pro_head_description
+#   omni_base_description pal_urdf_utils realsense2_description realsense2_camera_msgs
+repositories:
+  pal_deps/launch_pal:                {type: git, url: https://github.com/pal-robotics/launch_pal.git,                version: 0.22.1}
+  pal_deps/tiago_pro_robot:           {type: git, url: https://github.com/pal-robotics/tiago_pro_robot.git,           version: 2.5.1}
+  pal_deps/tiago_pro_moveit_config:   {type: git, url: https://github.com/pal-robotics/tiago_pro_moveit_config.git,   version: 1.5.2}
+  pal_deps/pal_sea_arm_moveit_config: {type: git, url: https://github.com/pal-robotics/pal_sea_arm_moveit_config.git, version: 1.0.7}
+  pal_deps/pal_sea_arm:               {type: git, url: https://github.com/pal-robotics/pal_sea_arm.git,               version: 2.8.4}
+  pal_deps/pal_pro_gripper:           {type: git, url: https://github.com/pal-robotics/pal_pro_gripper.git,           version: 1.12.6}
+  pal_deps/tiago_pro_head_robot:      {type: git, url: https://github.com/pal-robotics/tiago_pro_head_robot.git,      version: 1.12.0}
+  pal_deps/omni_base_robot:           {type: git, url: https://github.com/pal-robotics/omni_base_robot.git,           version: 2.18.0}
+  pal_deps/pal_urdf_utils:            {type: git, url: https://github.com/pal-robotics/pal_urdf_utils.git,            version: 2.11.1}
+  pal_deps/realsense-ros:             {type: git, url: https://github.com/IntelRealSense/realsense-ros.git,           version: 4.59.1}
